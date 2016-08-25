@@ -1,17 +1,17 @@
 ![MikroE](http://www.mikroe.com/img/designs/beta/logo_small.png)
 
-![Cap Extend Click](http://cdn.mikroe.com/img/click/cap-extend/cap-extend-click.png)
+![Diff Pressure Click](http://cdn.mikroe.com/img/click/diff-pressure-click/diff-pressure.png)
 
 ---
-[Product Page](http://www.mikroe.com/click/cap-extend/)
+[Product Page](http://www.mikroe.com/click/diff_pressure/)
 
-[Manual Page](http://docs.mikroe.com/Cap_Extend_click)
+[Manual Page](http://docs.mikroe.com/Diff_Pressure_click)
 
 ---
 
 ### General Description
 
-Cap Extend click is a mikroBUS™ add-on board with a SEMTECH SX8633 low power, capacitive button touch controller. It has 12 pins for connecting capacitive inputs (either touch-buttons or proximity sensors). Any sort of conductive object can be used as an input. Additional 8 GPIO pins, available on the side-edges of the board, can be used as LED drivers. The SX8633 IC integrates a 10 bit ADC – a resolution high enough to support a wide variety of touch pad sizes and shapes to be used with the click. Cap Extend click communicates with the target MCU through the mikroBUS™ I2C interface, with additional functionality provided by RST and INT pins. Designed to use a 3.3V power supply only.
+Description Coming Soon...
 
 
 ---
@@ -22,74 +22,81 @@ Cap Extend click is a mikroBUS™ add-on board with a SEMTECH SX8633 low power, 
 * MCU:             STM32F107VC
 * Dev.Board:       EasyMx Pro v7
 * Oscillator:      72 Mhz internal
-* Ext. Modules:    Accel 3 click
+* Ext. Modules:    Diff Pressure click
 * SW:              MikroC PRO for ARM 4.7.4
 
 ```
-#include <stdint.h>
 
 /*      Functions
  ****************************/
 
-#include <stdint.h>
-#include "capextend_hw.h"
+#include "diff_pressure_hw.h"
 
-void system_init( void );
+sbit DIFF_PRESSURE_CS         at GPIOD_ODR.B13;
+sbit DIFF_PRESSURE_RST  at GPIOC_ODR.B2;
+sbit DIFF_PRESSURE_RDY  at GPIOC_IDR.B11; //SPI3 MISO pin, data is converted and ready when this pin goes low ( 0 )
 
-sbit RST at GPIOC_ODR.B2;
+void system_setup( void );
 
-//Global Declatations
-uint8_t address     = 0x2B;
-uint8_t my_buffer         = 0;
-
-void system_init( void )
+void main()
 {
-    //GPIOs
-    GPIO_Digital_Output( &GPIOC_BASE, _GPIO_PINMASK_2 );
-    GPIO_Digital_Output( &GPIOD_BASE, _GPIO_PINMASK_ALL );
+    //Local Declarations
+    int32_t buffer = 0;
+    char uart_text[20] = { 0 };
+    float difference = 0.;
 
-    //Toggle Reset Pin
-    RST = 0;
-    Delay_ms(50);
-    RST = 1;
-    Delay_ms(200);
-    
-    //Initialize UART
-    UART1_Init( 9600 );
-    Delay_ms(100);
-    UART1_Write_Text( "UART Initialized\r\n" );
-    
-    //Initialize I2C
-    I2C1_Init_Advanced( 400000, &_GPIO_MODULE_I2C1_PB67 );
-    UART1_Write_Text( "I2C Initialized\r\n" );
-    
-    //Initialize Cap Extend
-    capextend_init( address );
-    UART1_Write_Text( "Cap Extend Initialized\r\n" );
-    
+    system_setup();
+
+    while (1)
+    {
+        if (        diff_pressure_read_adc( &buffer ) == OK )
+        {
+            LongToStr( buffer, uart_text );
+            UART1_Write_Text( "ADC Value: " );
+            Ltrim( uart_text );
+            UART1_Write_Text( uart_text );
+            UART1_Write_Text( "\r\n" );
+            difference = diff_pressure_get_kpa_difference( buffer );
+            sprintf( uart_text, "KPA Difference: %.2f", difference );
+            UART1_Write_Text( uart_text );
+            UART1_Write_Text( "\r\n" );
+            Delay_ms( 100 );
+            buffer = 0;
+        }
+        else if ( diff_pressure_read_adc( &buffer ) == OVH )
+            UART1_Write_Text( "Overflow happened\r\n" );
+        else if ( diff_pressure_read_adc( &buffer ) == OVL )
+            UART1_Write_Text( "Underflow happened\r\n" );
+    }
+
+
 }
 
-void main() 
+void system_setup( void )
 {
-    //Local Decalartions
-    uint8_t msb        = 0;
-    uint8_t lsb          = 0;
-    char uart_text[20] = { 0 };
-    
-    system_init();
-    Delay_ms(100);
-    
-    GPIOD_ODR = 0xFF;
+    //GPIOs
+    GPIO_Digital_Output( &GPIOD_BASE, _GPIO_PINMASK_13 );
+    GPIO_Digital_Output( &GPIOC_BASE, _GPIO_PINMASK_2 );
+    GPIO_Digital_Input( &GPIOC_BASE, _GPIO_PINMASK_11 );
 
-    while(1)
-    {
-         msb = capextend_read_msb_buttons();
-         lsb = capextend_read_lsb_buttons();
-         GPIOD_ODR = ( lsb | ( msb << 8 ) );
+    //UART
+    UART1_Init( 9600 );
+    Delay_ms(200);
+    UART1_Write_Text( "UART Initialized\r\n" );
 
-    }  //While
+    // SPI
+    SPI3_Init_Advanced( _SPI_FPCLK_DIV128, _SPI_MASTER | _SPI_8_BIT |
+                        _SPI_CLK_IDLE_LOW | _SPI_FIRST_CLK_EDGE_TRANSITION |
+                        _SPI_MSB_FIRST | _SPI_SS_DISABLE | _SPI_SSM_ENABLE |
+                        _SPI_SSI_1, &_GPIO_MODULE_SPI3_PC10_11_12 );
+    Delay_ms(200);
+    UART1_Write_Text( "SPI Initialized\r\n" );
 
-}  //Main
+    //Diff Pressure Click
+    diff_pressure_init();
+    UART1_Write_Text( "Diff Pressure Click Initialized\r\n" );
+
+}
 
 ```
 
