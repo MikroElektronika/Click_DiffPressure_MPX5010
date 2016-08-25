@@ -1,6 +1,6 @@
 ![MikroE](http://www.mikroe.com/img/designs/beta/logo_small.png)
 
-![Diff Pressure Click](http://cdn.mikroe.com/img/click/diff-pressure-click/diff-pressure.png)
+![Diff Pressure Click](http://cdn.mikroe.com/img/click/diff-pressure/diff-pressure-click.png)
 
 ---
 [Product Page](http://www.mikroe.com/click/diff-pressure/)
