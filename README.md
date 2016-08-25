@@ -3,7 +3,7 @@
 ![Diff Pressure Click](http://cdn.mikroe.com/img/click/diff-pressure-click/diff-pressure.png)
 
 ---
-[Product Page](http://www.mikroe.com/click/diff_pressure/)
+[Product Page](http://www.mikroe.com/click/diff-pressure/)
 
 [Manual Page](http://docs.mikroe.com/Diff_pressure_click)
 
