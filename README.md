@@ -11,7 +11,13 @@
 
 ### General Description
 
-UV 2 click is a mikroBUS™ add-on board with a VEML6075 UVA and UVB light sensor. VEML6075 is a CMOS chip that incorporates a photodiode, amplifiers, and analog/digital circuits. With UV 2 click, Solar ultraviolet light intensity is converted to 16-bit digital values. UVA and UVB are in separate channels. To keep a stable output in changing temperature conditions, the chip has temperature compensation capabilities. This ensures reliable performance under long term UV exposure. The sensor has a specified UVA sensitivity of 365 nm and UVB sensitivity of 315 nm The board communicates with the target MCU through the mikroBUS™ I2C interface. Designed to use a 3.3 power supply only.
+Diff pressure is a mikroBUS add-on board carrying an NXP MPXV5010DP signal conditioned, temperature compensated and calibrated pressure sensor with two axial ports to accommodate industrial grade tubing. It is designed for comparing two pressure measurements.
+
+The two ports are designated as Pressure side (P1) and Vacuum side (P2). The sensor is designed to operate with a positive differential pressure where P1 > P2. The measurement range is from 0 to 10 kPa. In the temperature range between 0º and 85ºC, the sensor has a maximum error rate of 5.0%.
+
+MPXV5010DP IC has an analog output. The signal passes through the onboard 22-bit ADC before being outputted through the mikroBUS SPI interface (CS, SCK, MISO).
+
+Diff pressure click is designed to use either a 3.3V or a 5V power supply.
 
 
 ---
