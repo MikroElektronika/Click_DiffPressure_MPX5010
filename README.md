@@ -11,7 +11,7 @@
 
 ### General Description
 
-Description Coming Soon...
+UV 2 click is a mikroBUS™ add-on board with a VEML6075 UVA and UVB light sensor. VEML6075 is a CMOS chip that incorporates a photodiode, amplifiers, and analog/digital circuits. With UV 2 click, Solar ultraviolet light intensity is converted to 16-bit digital values. UVA and UVB are in separate channels. To keep a stable output in changing temperature conditions, the chip has temperature compensation capabilities. This ensures reliable performance under long term UV exposure. The sensor has a specified UVA sensitivity of 365 nm and UVB sensitivity of 315 nm The board communicates with the target MCU through the mikroBUS™ I2C interface. Designed to use a 3.3 power supply only.
 
 
 ---
