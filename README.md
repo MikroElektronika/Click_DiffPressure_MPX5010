@@ -5,7 +5,7 @@
 ---
 [Product Page](http://www.mikroe.com/click/diff_pressure/)
 
-[Manual Page](http://docs.mikroe.com/Diff_Pressure_click)
+[Manual Page](http://docs.mikroe.com/Diff_pressure_click)
 
 ---
 
