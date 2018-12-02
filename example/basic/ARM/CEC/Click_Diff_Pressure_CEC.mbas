@@ -1,0 +1,102 @@
+'
+'Example for Diff_Pressure Click
+'
+'    Date          : Aug 2018.
+'    Author        : Nenad Filipovic
+'
+'Test configuration CEC :
+'    
+'    MCU              : CEC1702
+'    Dev. Board       : Clicker 2 for CEC1702
+'    ARM Compiler ver : v6.0.0.0
+'
+'---
+'
+'Description :
+'
+'The application is composed of three sections :
+'
+'- System Initialization - Initializes SPI and .
+'- Application Initialization - Initialization driver enable's - SPI. Start sending log via UART.
+'- Application Task - (code snippet) This is a example which demonstrates the use of Diff Pressure click board.
+'              The example is display
+'              values of ADC module (MPC3551) 22-bit register and
+'              value of difference pressure [ Pa ] via UART.
+'
+'Additional Functions :
+'
+'- Conversions
+'- Sprintf
+'- UART
+'
+'
+program Click_Diff_Pressure_CEC
+
+include Click_Diff_Pressure_types
+include Click_Diff_Pressure_config
+
+sub procedure systemInit() 
+
+    mikrobus_gpioInit(_MIKROBUS1, _MIKROBUS_CS_PIN, _GPIO_OUTPUT) 
+    mikrobus_spiInit(_MIKROBUS1, @_DIFFPRESSURE_SPI_CFG[0]) 
+    mikrobus_logInit(_MIKROBUS2, 9600) 
+    Delay_100ms() 
+
+end sub
+
+sub procedure applicationInit() 
+
+    diffpressure_spiDriverInit(T_DIFFPRESSURE_P(@_MIKROBUS1_GPIO), T_DIFFPRESSURE_P(@_MIKROBUS1_SPI)) 
+    mikrobus_logWrite("  Start Measurements", _LOG_LINE) 
+    mikrobus_logWrite("-----------------------", _LOG_LINE) 
+    mikrobus_logWrite("", _LOG_LINE) 
+    Delay_100ms() 
+
+end sub
+
+sub procedure applicationTask() 
+dim
+    difference as int32_t
+    adcValue as int32_t
+    differenceTxt as char[20]
+    adcValueTxt as char[20]
+    status as uint8_t
+    difference = 0
+    adcValue = 0
+
+    adcValue = diffpressure_readData() 
+    difference = diffpressure_getKpaDifference(adcValue) 
+    status = diffpressure_statusCheck(adcValue) 
+    LongIntToStr(adcValue, adcValueTxt) 
+    LongIntToStr(difference, differenceTxt) 
+    Ltrim(adcValueTxt) 
+    Ltrim(differenceTxt) 
+    if ((status = _DIFFPRESSURE_OK)) then 
+        mikrobus_logWrite("ADC Value:   ", _LOG_TEXT) 
+        mikrobus_logWrite(adcValueTxt, _LOG_LINE) 
+        mikrobus_logWrite("Difference: ", _LOG_TEXT) 
+        mikrobus_logWrite(differenceTxt, _LOG_TEXT) 
+        mikrobus_logWrite("  [Pa]", _LOG_LINE) 
+        Delay_ms(3000) 
+    end if
+    if ((status = _DIFFPRESSURE_OVH)) then 
+        mikrobus_logWrite("Overflow happened", _LOG_LINE) 
+        Delay_100ms() 
+    end if
+    if ((status = _DIFFPRESSURE_OVL)) then 
+        mikrobus_logWrite("Underflow happened", _LOG_LINE) 
+        Delay_100ms() 
+    end if
+    mikrobus_logWrite("", _LOG_LINE) 
+
+end sub
+
+main :
+
+    systemInit() 
+    applicationInit() 
+    while (1) 
+        applicationTask() 
+    wend
+
+end.
